@@ -647,6 +647,37 @@ function toggle_tgm(el){
 
 
 // 初始化
+function initSelects() {
+  var year = document.getElementById('year');
+  var month = document.getElementById('month');
+  var day = document.getElementById('day');
+  var hour = document.getElementById('hour');
+  for (var i = 1950; i <= 2030; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    year.appendChild(opt);
+  }
+  for (var i = 1; i <= 12; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    month.appendChild(opt);
+  }
+  for (var i = 1; i <= 31; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    day.appendChild(opt);
+  }
+  for (var i = 0; i <= 23; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    hour.appendChild(opt);
+  }
+}
+initSelects();
 doCalc();
 </script>
 </body>
