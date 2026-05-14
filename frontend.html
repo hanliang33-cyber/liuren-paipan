@@ -625,8 +625,7 @@ function renderBazi(d, y) {
     for(var i=0;i<4;i++)baziText+=gl[i]+zl[i]+' ';
     html+='<div class="jx-card fade-in" style="display:block"><h3>八字信息</h3>';
     html+='<div class="jx-content" style="line-height:2;font-size:13px">';
-    html+='<span class="jx-label">四柱</span><span class="jx-line">  '+baziText+'
-';
+    html+='<span class="jx-label">四柱</span><span class="jx-line">  '+baziText+' ';
     html+='<span class="jx-label">大运</span><span class="jx-line">  '+(d.dayun||[]).join(' → ')+'</span></div></div>';
     
     document.getElementById('result').innerHTML = html;
