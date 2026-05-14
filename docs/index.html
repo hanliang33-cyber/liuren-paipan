@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>六壬时课 · 在线起卦</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0d0d1a;
+  --card:#13132a;
+  --card2:#1a1a38;
+  --border:#2a2a4a;
+  --gold:#d4a853;
+  --gold2:#e8c878;
+  --text:#e8d5a3;
+  --sub:#8b7d6b;
+  --green:#7bcfa8;
+  --red:#e87a7a;
+  --blue:#7aade8;
+  --purple:#a87ae8;
+  --radius:12px;
+}
+body{background:var(--bg);color:var(--text);font-family:'PingFang SC','Hiragino Sans GB','Microsoft YaHei',sans-serif;min-height:100vh;padding:20px;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(212,168,83,0.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 80% 100%,rgba(123,207,168,0.05) 0%,transparent 50%);
+}
+.container{max-width:900px;margin:0 auto}
+
+/* === 头部 === */
+.header{text-align:center;padding:24px 0 16px}
+.header h1{font-size:32px;font-weight:300;color:var(--gold);letter-spacing:8px;margin-bottom:8px}
+.header h1 span{display:inline-block;margin:0 4px}
+.header .subtitle{color:var(--sub);font-size:13px;letter-spacing:3px}
+.header .divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:12px auto 0}
+
+/* === 输入区 === */
+.input-panel{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 24px;
+  margin-bottom:16px;
+  box-shadow:0 4px 24px rgba(0,0,0,0.3);
+}
+.input-row{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:14px}
+.field{flex:1;min-width:80px}
+.field label{display:block;font-size:11px;color:var(--sub);margin-bottom:5px;letter-spacing:1px}
+.field select,.field input{
+  width:100%;padding:9px 12px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  color:var(--text);
+  font-size:14px;
+  transition:border-color 0.2s;
+}
+.field select:focus,.field input:focus{outline:none;border-color:var(--gold)}
+.field select option{background:#1a1a38}
+.btn-row{display:flex;gap:10px;justify-content:center}
+.btn{
+  padding:9px 24px;
+  border:1px solid var(--gold);
+  background:transparent;
+  color:var(--gold);
+  border-radius:8px;
+  cursor:pointer;
+  font-size:14px;
+  letter-spacing:2px;
+  transition:all 0.2s;
+}
+.btn:hover{background:rgba(212,168,83,0.15)}
+.btn-primary{background:var(--gold);color:#0d0d1a;font-weight:600}
+.btn-primary:hover{background:var(--gold2);box-shadow:0 0 20px rgba(212,168,83,0.3)}
+
+/* === 结果区 === */
+.result{}
+
+/* === 基本信息卡 === */
+.info-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px 20px;
+  margin-bottom:12px;
+  display:none;
+}
+.info-grid{display:flex;flex-wrap:wrap;gap:8px}
+.info-tag{
+  padding:6px 14px;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:20px;
+  font-size:13px;
+  display:flex;align-items:center;gap:6px;
+}
+.info-tag .lbl{color:var(--sub);font-size:11px}
+.info-tag .val{color:var(--gold);font-weight:600}
+
+/* === 天地盘 === */
+.panels{display:none}
+.tp-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:12px;
+}
+.tp-card h3{color:var(--gold);font-size:13px;font-weight:400;letter-spacing:2px;margin-bottom:12px;text-align:center}
+.tp-row{display:flex;gap:12px;flex-wrap:wrap}
+.tp-box{flex:1;min-width:160px;text-align:center}
+.tp-grid{display:inline-grid;grid-template-columns:repeat(4,50px);grid-template-rows:repeat(4,50px);gap:3px;margin-top:8px}
+.tp-cell{
+  display:flex;align-items:center;justify-content:center;
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:6px;
+  font-size:17px;font-weight:600;
+  transition:all 0.2s;
+}
+.tp-cell:hover{border-color:var(--gold);transform:scale(1.05)}
+.tp-cell.bk{visibility:hidden}
+.tp-cell.tc{color:var(--gold2);font-size:15px}
+
+/* === 四课 === */
+.sk-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:12px;
+  display:none;
+}
+.sk-card h3{color:var(--gold);font-size:13px;font-weight:400;letter-spacing:2px;margin-bottom:14px}
+.sk-table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:8px;border:1px solid var(--border)}
+.sk-table th{
+  background:var(--card2);color:var(--gold);padding:10px 8px;
+  font-size:11px;font-weight:400;letter-spacing:1px;
+  border-bottom:1px solid var(--border);
+}
+.sk-table td{
+  padding:12px 10px;text-align:center;font-size:14px;
+  border-bottom:1px solid var(--border);
+  background:var(--card);
+}
+.sk-table tr:last-child td{border-bottom:none}
+.sk-table .课名{color:var(--sub);font-size:12px;width:80px}
+.sk-table .地支{font-size:20px;font-weight:700;color:var(--gold2)}
+.sk-table .神将{font-size:16px}
+.sk-table .关系{padding:4px 8px;border-radius:10px;font-size:11px}
+.sk-table .关系.贼{background:rgba(232,122,122,0.15);color:var(--red)}
+.sk-table .关系.克{background:rgba(123,207,168,0.15);color:var(--green)}
+.sk-table .关系.无{background:rgba(139,125,107,0.1);color:var(--sub)}
+
+/* === 三传 === */
+.sc-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:12px;
+  display:none;
+}
+.sc-header{margin-bottom:16px;text-align:center}
+.sc-header .课体标签{
+  display:inline-block;
+  padding:6px 20px;
+  background:linear-gradient(135deg,rgba(212,168,83,0.2),rgba(212,168,83,0.1));
+  border:1px solid var(--gold);
+  border-radius:20px;
+  color:var(--gold);
+  font-size:14px;
+  letter-spacing:3px;
+  margin-bottom:8px;
+}
+.sc-header .课体说明{color:var(--sub);font-size:12px;line-height:1.8}
+.sc-flow{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.sc-chuan{
+  display:flex;flex-direction:column;align-items:center;
+  background:var(--card2);
+  border:2px solid var(--border);
+  border-radius:12px;
+  padding:14px 20px;
+  min-width:90px;
+  transition:all 0.2s;
+}
+.sc-chuan:hover{border-color:var(--gold);transform:translateY(-2px)}
+.sc-chuan.da-ji{border-color:var(--green);background:rgba(123,207,168,0.08)}
+.sc-chuan.xiong{border-color:var(--red);background:rgba(232,122,122,0.08)}
+.sc-chuan.zhong{border-color:var(--gold);background:rgba(212,168,83,0.08)}
+.sc-chuan .阶段{font-size:10px;color:var(--sub);margin-bottom:6px;letter-spacing:1px}
+.sc-chuan .地支{font-size:28px;font-weight:700;color:var(--text)}
+.sc-chuan .神将{font-size:14px;margin-top:4px}
+.sc-chuan .吉凶{
+  font-size:10px;padding:2px 8px;border-radius:10px;margin-top:4px;
+}
+.sc-chuan.da-ji .吉凶{background:rgba(123,207,168,0.2);color:var(--green)}
+.sc-chuan.xiong .吉凶{background:rgba(232,122,122,0.2);color:var(--red)}
+.sc-chuan.zhong .吉凶{background:rgba(212,168,83,0.2);color:var(--gold)}
+.sc-arrow{font-size:22px;color:var(--sub)}
+
+/* === 天官全盘 === */
+.tgm-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  margin-bottom:12px;
+  display:none;
+}
+.tgm-toggle{
+  color:var(--gold);font-size:13px;cursor:pointer;
+  display:flex;align-items:center;gap:8px;letter-spacing:1px;
+  padding:4px 0;
+}
+.tgm-toggle:hover{color:var(--gold2)}
+.tgm-toggle .arr{transition:transform 0.2s;font-size:11px}
+.tgm-toggle.open .arr{transform:rotate(90deg)}
+.tgm-content{display:none;margin-top:14px}
+.tgm-content.open{display:block}
+.tgm-pan{text-align:center;margin-top:10px}
+.tgm-pan .tp-grid{display:inline-grid}
+.tgm-cell{font-size:13px!important}
+
+/* === 断课 === */
+.jx-card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:20px 24px;
+  margin-bottom:12px;
+  display:none;
+}
+.jx-card h3{color:var(--gold);font-size:13px;font-weight:400;letter-spacing:2px;margin-bottom:16px}
+.jx-content{
+  background:var(--card2);
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:18px 20px;
+  font-size:13px;
+  line-height:2;  /* 行距2倍 */
+  white-space:pre-wrap;
+  color:var(--text);
+}
+.jx-content .section{display:block;margin-bottom:8px}
+.jx-content .section:last-child{margin-bottom:0}
+.jx-label{color:var(--gold);font-weight:600}
+.jx-line{color:var(--sub)}
+
+/* === Footer === */
+.footer{
+  text-align:center;
+  padding:24px 0 16px;
+  color:var(--sub);
+  font-size:12px;
+  line-height:2;
+}
+.footer .name{color:var(--gold);font-size:14px;letter-spacing:4px;margin-bottom:4px}
+.footer .desc{font-size:11px;letter-spacing:1px}
+.footer .line{width:40px;height:1px;background:linear-gradient(90deg,transparent,var(--border),transparent);margin:10px auto}
+
+/* === 空状态 === */
+.empty{text-align:center;padding:40px;color:var(--sub);font-size:13px;letter-spacing:1px}
+
+/* === 动画 === */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.fade-in{animation:fadeIn 0.3s ease-out}
+
+/* 加载状态 */
+.loading { color: #8b7d6b; text-align: center; padding: 40px; }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- 头部 -->
+<div class="header">
+  <h1><span>六</span><span>壬</span><span>时</span><span>课</span></h1>
+  <p class="subtitle">月将加时 · 四课三传 · 天官贵神</p>
+  <div class="divider"></div>
+</div>
+
+<!-- 输入 -->
+<div class="input-panel">
+  <div class="input-row">
+    <div class="field"><label>模式</label>
+      <select id="mode" onchange="toggleMode()">
+        <option value="zhanbu">单事占卜（六壬）</option>
+        <option value="zhongshen">终身论命（六壬）</option>
+        <option value="bazi">八字排盘</option>
+      </select>
+    </div>
+    <div class="field" id="name-group" style="display:none"><label>姓名</label>
+      <input type="text" id="uname" placeholder="张三">
+    </div>
+    <div class="field" id="gender-group" style="display:none"><label>性别</label>
+      <select id="ugen">
+        <option value="男">男</option>
+        <option value="女">女</option>
+      </select>
+    </div>
+  </div>
+  <div class="input-row">
+    <div class="field"><label>年</label><select id="year"></select></div>
+    <div class="field"><label>月</label><select id="month"></select></div>
+    <div class="field"><label>日</label><select id="day"></select></div>
+    <div class="field"><label>时</label><select id="hour"></select></div>
+  </div>
+  <div id="zhanbu-params">
+  <div class="input-row">
+    <div class="field"><label>占时</label>
+      <select id="uzhan">
+        <option value="now">现在时间</option>
+        <option value="子">子时</option><option value="丑">丑时</option>
+        <option value="寅">寅时</option><option value="卯">卯时</option>
+        <option value="辰">辰时</option><option value="巳">巳时</option>
+        <option value="午">午时</option><option value="未">未时</option>
+        <option value="申">申时</option><option value="酉">酉时</option>
+        <option value="戌">戌时</option><option value="亥">亥时</option>
+      </select>
+    </div>
+    <div class="field"><label>月将</label>
+      <select id="yj">
+        <option value="auto">自动</option>
+        <option value="子">子 · 神后</option><option value="丑">丑 · 大吉</option>
+        <option value="寅">寅 · 功曹</option><option value="卯">卯 · 太冲</option>
+        <option value="辰">辰 · 天罡</option><option value="巳">巳 · 太乙</option>
+        <option value="午">午 · 胜光</option><option value="未">未 · 小吉</option>
+        <option value="申">申 · 传送</option><option value="酉">酉 · 从魁</option>
+        <option value="戌">戌 · 河魁</option><option value="亥">亥 · 登明</option>
+      </select>
+    </div>
+    <div class="field"><label>贵人</label>
+      <select id="ugr">
+        <option value="auto">自动</option><option value="昼">昼贵</option><option value="夜">夜贵</option>
+      </select>
+    </div>
+    <div class="field"><label>顺逆</label>
+      <select id="usn">
+        <option value="auto">自动</option><option value="顺行">顺行</option><option value="逆行">逆行</option>
+      </select>
+    </div>
+    <div class="field" style="flex:2;min-width:140px"><label>占事</label><input id="zs" placeholder="学业 · 求财 · 婚姻 · 出行"></div>
+  </div>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-primary" id="calc-btn" onclick="doCalc()">起　课</button>
+    <button class="btn" onclick="fillNow()">现在时辰</button>
+  </div>
+</div>
+<!-- 结果容器 -->
+<div id="result" class="result"></div>
+<div class="footer">
+  <div class="name">六壬时课</div>
+  <div class="line"></div>
+  <p class="desc">大六壬占法 · 四课三传以定吉凶 · 天官神将辨人间祸福</p>
+  <p class="desc">本系统纯属学术研究，古法推演，结果仅供参考娱乐</p>
+</div>
+
+<script>
+var API_BASE = 'http://localhost:19130'; // 部署时改为你的API地址
+
+// ========== 模式切换 ==========
+function toggleMode() {
+    var v = document.getElementById('mode').value;
+    var zp = document.getElementById('zhanbu-params');
+    var gg = document.getElementById('gender-group');
+    var ng = document.getElementById('name-group');
+    var btn = document.getElementById('calc-btn');
+    if (v === 'zhanbu') {
+        if(zp)zp.style.display='';
+        if(gg)gg.style.display='none';
+        if(ng)ng.style.display='none';
+        btn.textContent='起　课';
+    } else if (v === 'zhongshen') {
+        if(zp)zp.style.display='none';
+        if(gg)gg.style.display='none';
+        if(ng)ng.style.display='';
+        btn.textContent='论　命';
+    } else if (v === 'bazi') {
+        if(zp)zp.style.display='none';
+        if(gg)gg.style.display='';
+        if(ng)ng.style.display='';
+        btn.textContent='排　盘';
+    }
+}
+
+// ========== 主计算 ==========
+async function doCalc() {
+    var mode = document.getElementById('mode').value;
+    var y = ~~document.getElementById('year').value||2026;
+    var m = ~~document.getElementById('month').value||1;
+    var d = ~~document.getElementById('day').value||1;
+    var h = ~~document.getElementById('hour').value||0;
+
+    if (mode === 'zhongshen') {
+        var nm = document.getElementById('uname').value||'';
+        document.getElementById('result').innerHTML = '<div class="loading">推算终身命运中...</div>';
+        fetch(API_BASE + '/api/zhongshen', {method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({year:y, month:m, day:d, hour:h, minute:0, name:nm})})
+        .then(function(r){return r.json()}).then(function(dt){renderZhongshen(dt,y,m,d,h);saveHistory(dt,'zhongshen')})
+        .catch(function(e){document.getElementById('result').innerHTML='<div class="loading" style="color:#e87a7a">失败:'+e.message+'</div>';});
+        return;
+    }
+    if (mode === 'bazi') {
+        var gn = document.getElementById('ugen').value||'男';
+        document.getElementById('result').innerHTML = '<div class="loading">排盘中...</div>';
+        fetch(API_BASE + '/api/bazi', {method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({year:y, month:m, day:d, hour:h, gender:gn})})
+        .then(function(r){return r.json()}).then(function(dt){renderBazi(dt,y);saveHistory(dt,'bazi')})
+        .catch(function(e){document.getElementById('result').innerHTML='<div class="loading" style="color:#e87a7a">失败:'+e.message+'</div>';});
+        return;
+    }
+    // 占卜模式 - call Flask API for computation
+    var zhan = document.getElementById('uzhan').value;
+    var yj = document.getElementById('yj').value;
+    var gr = document.getElementById('ugr').value;
+    var sn = document.getElementById('usn').value;
+    var zs = document.getElementById('zs').value;
+    var h = parseInt(document.getElementById('hour').value) || 0;
+    if (zhan !== 'now') {
+        var zidx = ['子','丑','寅','卯','辰','巳','午','未','申','酉','戌','亥'].indexOf(zhan);
+        if (zidx >= 0) h = zidx * 2;
+    }
+    document.getElementById('result').innerHTML = '<div class="loading">排列天地盘中...</div>';
+    try {
+        var resp = await fetch(API_BASE + '/api/paipan', {method:'POST', headers:{'Content-Type':'application/json'},
+            body:JSON.stringify({year:y, month:m, day:d, hour:h, minute:0, yuejiang:yj, zhanshi:zs, guiren:gr, shunni:sn})});
+        var data = await resp.json();
+        render(data);
+    } catch(e) {
+        document.getElementById('result').innerHTML = '<div class="loading" style="color:#e87a7a">起课失败:'+e.message+'</div>';
+    }
+}
+
+function fillNow() {
+    var n = new Date();
+    document.getElementById('year').value = n.getFullYear();
+    document.getElementById('month').value = n.getMonth() + 1;
+    document.getElementById('day').value = n.getDate();
+    document.getElementById('hour').value = n.getHours();
+    document.getElementById('uzhan').value = 'now';
+}
+
+// ========== 六壬占卜渲染 ==========
+function render(d) {
+    let h = '';
+    // 基本信息
+    h += `<div class="info-card fade-in" style="display:block">`;
+    h += `<div class="info-grid">`;
+    h += `<div class="info-tag"><span class="lbl">日期</span><span class="val">${d.year}年${d.month}月${d.day}日</span></div>`;
+    h += `<div class="info-tag"><span class="lbl">时辰</span><span class="val">${d.hour}时 · ${d.shichen}</span></div>`;
+    h += `<div class="info-tag"><span class="lbl">日干支</span><span class="val">${d.ri_gan}${d.ri_zhi}</span></div>`;
+    h += `<div class="info-tag"><span class="lbl">月将</span><span class="val">${d.yuejiang} · ${d.yuejiang_name}</span></div>`;
+    h += `<div class="info-tag"><span class="lbl">贵人</span><span class="val">${d.guiren_gong}（${d.guiren_order}）</span></div>`;
+    if(d.zhan_shi) h += `<div class="info-tag"><span class="lbl">占事</span><span class="val">${d.zhan_shi}</span></div>`;
+    h += `</div></div>`;
+
+    let pos=[['巳','午','未','申'],['辰','','','酉'],['卯','','','戌'],['寅','丑','子','亥']];
+    const tc={'贵人':'#d4a853','螣蛇':'#e87a7a','朱雀':'#e87a7a','六合':'#7bcfa8','勾陈':'#e87a7a','青龙':'#7bcfa8','天后':'#d4a853','太阴':'#8b7d6b','玄武':'#8b7d6b','太常':'#7bcfa8','白虎':'#e87a7a','天空':'#8b7d6b'};
+
+    // 天地盘
+    h += `<div class="tp-card fade-in" style="display:block">`;
+    h += `<h3>天盘 · 地盘</h3>`;
+    h += `<div class="tp-row">`;
+    h += `<div class="tp-box"><div style="color:#8b7d6b;font-size:11px;margin-bottom:6px">天盘</div><div class="tp-grid">`;
+    for(let r=0;r<4;r++){for(let c=0;c<4;c++){let z=pos[r][c];if(!z)h+='<div class="tp-cell bk"></div>';else h+=`<div class="tp-cell tc">${d.tianpan[z]||''}</div>`}}
+    h += `</div></div>`;
+    h += `<div class="tp-box"><div style="color:#8b7d6b;font-size:11px;margin-bottom:6px">地盘</div><div class="tp-grid">`;
+    for(let r=0;r<4;r++){for(let c=0;c<4;c++){let z=pos[r][c];if(!z)h+='<div class="tp-cell bk"></div>';else h+=`<div class="tp-cell">${z}</div>`}}
+    h += `</div></div></div></div>`;
+
+    // 四课
+    h += `<div class="sk-card fade-in" style="display:block">`;
+    h += `<h3>四课</h3>`;
+    h += `<table class="sk-table"><thead><tr><th>课</th><th>寄宫</th><th>地支</th><th>天盘神</th><th>克贼</th></tr></thead><tbody>`;
+    const gong={'甲':'寅','乙':'辰','丙':'巳','丁':'未','戊':'巳','己':'未','庚':'申','辛':'戌','壬':'亥','癸':'丑'};
+    for(let i=0;i<d.sike.length;i++){
+        let s=d.sike[i],rel='无克',cls='无';
+        if(d.ke_details&&d.ke_details[i]){if(d.ke_details[i].zei){rel='⬆ 下贼上';cls='贼'}else if(d.ke_details[i].ke){rel='⬇ 上克下';cls='克'}}
+        h+=`<tr><td class="课名">${s[0]}</td><td style="color:#8b7d6b;font-size:12px">${s[1]}</td><td class="地支">${s[2]}</td><td class="神将" style="color:${tc[d.tianguan_map[s[2]]]||'#a88b5a'}">${d.tianguan_map[s[2]]||''}</td><td><span class="关系 ${cls}">${rel}</span></td></tr>`;
+    }
+    h+=`</tbody></table></div>`;
+
+    // 三传
+    h+=`<div class="sc-card fade-in" style="display:block">`;
+    h+=`<div class="sc-header"><div class="课体标签">${d.keti}</div><p class="课体说明">${d.keti_desc||''}</p></div>`;
+    h+=`<div class="sc-flow">`;
+    for(let i=0;i<d.sanchuan.length;i++){
+        let c2=d.sanchuan[i],tg=d.tianguan_on_chuan[i]||'',jx=d.jixiong_on_chuan[i]||'中';
+        let cls=jx==='大吉'||jx==='吉'?'da-ji':jx==='大凶'||jx==='凶'?'xiong':'zhong';
+        if(i>0)h+=`<div class="sc-arrow">→</div>`;
+        h+=`<div class="sc-chuan ${cls}"><div class="阶段">${c2[1]}</div><div class="地支">${c2[0]}</div><div class="神将" style="color:${tc[tg]||'#a88b5a'}">${tg}</div><div class="吉凶">${jx}</div></div>`;
+    }
+    h+=`</div></div>`;
+
+    // 天官全盘
+    h+=`<div class="tgm-card fade-in" style="display:block">`;
+    h+=`<div class="tgm-toggle" onclick="toggle_tgm(this)"><span class="arr">▶</span>天官全盘分布</div>`;
+    h+=`<div class="tgm-content">`;
+    h+=`<div class="tgm-pan"><div class="tp-grid">`;
+    for(let r=0;r<4;r++){for(let c=0;c<4;c++){let z=pos[r][c];if(!z)h+='<div class="tp-cell bk"></div>';else h+=`<div class="tp-cell tgm-cell" style="color:${tc[d.tianguan_map[z]]||'#e8d5a3'}">${d.tianguan_map[z]||''}</div>`}}
+    h+=`</div></div></div></div>`;
+
+    // 断课
+    h+=`<div class="jx-card fade-in" style="display:block">`;
+    h+=`<h3>断课详解</h3>`;
+    h+=`<div class="jx-content">`;
+    h+=`<span class="jx-label">三传走势</span>\n`;
+    h+=`<span class="jx-line">─────────────────────────────────</span>\n`;
+    for(let i=0;i<d.sanchuan.length;i++){
+        let c2=d.sanchuan[i],tg=d.tianguan_on_chuan[i]||'',jx=d.jixiong_on_chuan[i]||'中',cs=d.changsheng_on_chuan[i]||'';
+        h+=`  ${c2[1]}：${c2[0]} 乘 ${tg}（${jx}）— ${cs}\n`;
+    }
+    h+=`\n<span class="jx-label">课体</span><span class="jx-line">  ${d.keti}</span>\n`;
+    h+=`<span class="jx-line">  ${d.keti_desc||''}</span>\n`;
+    let jx1=d.jixiong_on_chuan[0],jx3=d.jixiong_on_chuan[2];
+    h+=`\n<span class="jx-label">三传总评</span>\n`;
+    h+=`  初传<span class="jx-line">：</span>${jx1==='大吉'||jx1==='吉'?'<span style="color:#7bcfa8">吉神，起步有利</span>':'<span style="color:#e87a7a">凶神，起步有压力</span>'}\n`;
+    h+=`  末传<span class="jx-line">：</span>${jx3==='大吉'||jx3==='吉'?'<span style="color:#7bcfa8">吉神，结果看好</span>':'<span style="color:#e87a7a">凶神，结果需谨慎</span>'}\n`;
+    h+=`\n<span class="jx-label">基础信息</span>\n`;
+    h+=`<span class="jx-line">─────────────────────────────────</span>\n`;
+    h+=`  月将<span class="jx-line">：</span>${d.yuejiang}（${d.yuejiang_name}）\n`;
+    h+=`  占时<span class="jx-line">：</span>${d.shichen}时\n`;
+    h+=`  日干<span class="jx-line">：</span>${d.ri_gan}${d.ri_zhi}，${d.ri_gan}寄${gong[d.ri_gan]||''}\n`;
+    h+=`  贵人<span class="jx-line">：</span>${d.guiren_gong}（${d.guiren_order}）\n`;
+    h+=`\n<span class="jx-label">四课</span><span class="jx-line">（克贼关系）</span>\n`;
+    h+=`<span class="jx-line">─────────────────────────────────</span>\n`;
+    for(let s of d.sike){
+        let rel='';
+        for(let j=0;j<(d.ke_details||[]).length;j++){if(d.ke_details[j].zei)rel='⬆ 下贼上';else if(d.ke_details[j].ke)rel='⬇ 上克下'}
+        h+=`  ${s[0]}：${s[1]} → ${s[2]} 乘 ${d.tianguan_map[s[2]]||''}  <span class="jx-line">${rel||'— 无克'}</span>\n`;
+    }
+    h+=`\n<span class="jx-label">九宗门</span><span class="jx-line">：</span>${d.keti}\n`;
+    h+=`<span class="jx-label">三传</span><span class="jx-line">：</span>`;
+    for(let c2 of d.sanchuan)h+=` ${c2[0]}`;
+    h+=`\n  学习过程：\n  ${d.learning||''}`;
+    h+=`</div></div>`;
+
+    document.getElementById('result').innerHTML = h;
+}
+
+// ========== 终身论命 ==========
+function renderZhongshen(d, y, m, d2, h) {
+    var o = {y:y, m:m, d:d2, h:h};
+    var html='<div class="info-card fade-in" style="display:block"><div class="info-grid">';
+    html+='<div class="info-tag"><span class="lbl">出生</span><span class="val">'+o.y+'年'+o.m+'月'+o.d+'日 '+o.h+'时</span></div>';
+    html+='<div class="info-tag"><span class="lbl">日干</span><span class="val">'+d.ri_gan+d.ri_zhi+'</span></div>';
+    html+='<div class="info-tag"><span class="lbl">课体</span><span class="val">'+d.keti+'</span></div>';
+    html+='<div class="info-tag"><span class="lbl">月将</span><span class="val">'+d.yuejiang+'</span></div>';
+    if(d.name) html+='<div class="info-tag"><span class="lbl">姓名</span><span class="val">'+d.name+'</span></div>';
+    html+='</div></div>';
+    
+    // 格局
+    if(d.geju && d.geju.length){
+        html+='<div class="sk-card fade-in" style="display:block"><h3>格局</h3>';
+        for(var i=0;i<d.geju.length;i++){
+            html+='<div style="background:var(--card2);padding:10px 14px;border-radius:8px;margin:4px 0;border-left:3px solid var(--gold);font-size:13px">';
+            html+='<strong style="color:var(--gold)">'+d.geju[i][0]+'</strong> — '+d.geju[i][1]+'</div>';}
+        html+='</div>';
+    }
+    
+    // 三世（三传）
+    html+='<div class="sc-card fade-in" style="display:block">';
+    html+='<div class="sc-header"><div class="课体标签">三世</div><p class="课体说明">六壬终身论命 · 三传定一生起伏</p></div>';
+    html+='<div class="sc-flow">';
+    var tc={贵人:'#d4a853',螣蛇:'#e87a7a',朱雀:'#e87a7a',六合:'#7bcfa8',勾陈:'#e87a7a',青龙:'#7bcfa8',天后:'#d4a853',太阴:'#8b7d6b',玄武:'#8b7d6b',太常:'#7bcfa8',白虎:'#e87a7a',天空:'#8b7d6b'};
+    for(var i=0;i<(d.shisan||[]).length;i++){
+        var s=d.shisan[i],jx=s.吉凶;
+        var cls=jx==='大吉'||jx==='吉'?'da-ji':jx==='大凶'||jx==='凶'?'xiong':'zhong';
+        if(i>0)html+='<div class="sc-arrow">→</div>';
+        html+='<div class="sc-chuan '+cls+'">';
+        html+='<div class="阶段">'+s.阶段+'</div>';
+        html+='<div class="地支">'+s.地支+'</div>';
+        html+='<div class="神将" style="color:'+(tc[s.天官]||'#a88b5a')+'">'+s.天官+'</div>';
+        html+='<div class="吉凶">'+jx+' · '+s.长生+'</div></div>';}
+    html+='</div></div>';
+    
+    // 十二宫
+    if(d.gong && d.gong.length){
+        html+='<div class="tp-card fade-in" style="display:block"><h3>十二宫</h3>';
+        html+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
+        for(var i=0;i<d.gong.length;i++){
+            var g=d.gong[i];
+            var bg=g.吉凶==='大吉'||g.吉凶==='吉'?'rgba(123,207,168,.15)':g.吉凶==='大凶'||g.吉凶==='凶'?'rgba(232,122,122,.15)':'var(--card2)';
+            html+='<div style="background:'+bg+';padding:8px 10px;border-radius:8px;font-size:13px">';
+            html+='<strong style="color:var(--gold)">'+g.宫+'</strong> '+g.天官+'('+g.吉凶+')</div>';}
+        html+='</div></div>';}
+    
+    document.getElementById('result').innerHTML = html;
+}
+
+// ========== 八字排盘 ==========
+function renderBazi(d, y) {
+    var html='<div class="info-card fade-in" style="display:block"><div class="info-grid">';
+    if(d.name) html+='<div class="info-tag"><span class="lbl">姓名</span><span class="val">'+d.name+' ('+d.gender+')</span></div>';
+    html+='<div class="info-tag"><span class="lbl">节气</span><span class="val">'+d.jieqi_lichun+'立春 · '+d.jieqi_yue+'月节</span></div>';
+    html+='</div></div>';
+    
+    var gl=[d.year_gan,d.month_gan,d.day_gan,d.hour_gan];
+    var zl=[d.year_zhi,d.month_zhi,d.day_zhi,d.hour_zhi];
+    html+='<div class="sk-card fade-in" style="display:block">';
+    html+='<h3>四柱八字</h3>';
+    html+='<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px">';
+    var zhuLabels=['年柱','月柱','日柱','时柱'];
+    for(var i=0;i<4;i++){
+        html+='<div class="bazi-col" style="background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center">';
+        html+='<div style="font-size:11px;color:var(--sub);margin-bottom:6px">'+zhuLabels[i]+'</div>';
+        html+='<div style="font-size:26px;font-weight:700;color:var(--gold2)">'+gl[i]+'</div>';
+        html+='<div style="font-size:26px;font-weight:700;color:var(--text)">'+zl[i]+'</div>';
+        html+='<div style="font-size:11px;color:var(--sub);margin-top:4px">'+(d.shi_shen[i]||'')+'</div></div>';}
+    html+='</div></div>';
+    
+    // 大运
+    if(d.dayun && d.dayun.length){
+        html+='<div class="tp-card fade-in" style="display:block"><h3>大运</h3>';
+        html+='<div style="display:flex;gap:6px;flex-wrap:wrap">';
+        for(var i=0;i<d.dayun.length;i++){
+            var dy=d.dayun[i];
+            var now=(y>=d.year+i*10+4&&y<d.year+i*10+4+10);
+            html+='<div style="padding:5px 10px;border-radius:20px;font-size:12px;background:'+(now?'rgba(212,168,83,.2)':'var(--card2)')+';border:'+(now?'1px solid var(--gold)':'1px solid var(--border)')+'">'+dy+'</div>';}
+        html+='</div></div>';}
+    
+    // 八字总览
+    var baziText='';
+    for(var i=0;i<4;i++)baziText+=gl[i]+zl[i]+' ';
+    html+='<div class="jx-card fade-in" style="display:block"><h3>八字信息</h3>';
+    html+='<div class="jx-content" style="line-height:2;font-size:13px">';
+    html+='<span class="jx-label">四柱</span><span class="jx-line">  '+baziText+'
+';
+    html+='<span class="jx-label">大运</span><span class="jx-line">  '+(d.dayun||[]).join(' → ')+'</span></div></div>';
+    
+    document.getElementById('result').innerHTML = html;
+}
+
+// ========== 历史记录 ==========
+function saveHistory(d,mode){
+    // placeholder - optional feature
+}
+
+// ========== 天官全盘折叠 ==========
+function toggle_tgm(el){
+    var cont=el.nextElementSibling;
+    el.classList.toggle('open');
+    cont.classList.toggle('open');
+    el.querySelector('.arr').textContent=cont.classList.contains('open')?'▼ ':'▶ ';
+}
+
+
+// 初始化
+function initSelects() {
+  var year = document.getElementById('year');
+  var month = document.getElementById('month');
+  var day = document.getElementById('day');
+  var hour = document.getElementById('hour');
+  for (var i = 1950; i <= 2030; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    year.appendChild(opt);
+  }
+  for (var i = 1; i <= 12; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    month.appendChild(opt);
+  }
+  for (var i = 1; i <= 31; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    day.appendChild(opt);
+  }
+  for (var i = 0; i <= 23; i++) {
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = i;
+    hour.appendChild(opt);
+  }
+}
+initSelects();
+doCalc();
+</script>
+</body>
+</html>
